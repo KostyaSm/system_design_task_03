@@ -1,24 +1,41 @@
 version: '3.8'
 
 services:
-  db:
-    image: postgres:15-alpine
-    container_name: ozon_postgres
+  postgres:
+    image: postgres:16-alpine
+    container_name: fitness_postgres
     environment:
-      POSTGRES_DB: ozon_store
-      POSTGRES_USER: user
-      POSTGRES_PASSWORD: password
+      POSTGRES_USER: fitness_user
+      POSTGRES_PASSWORD: fitness_pass
+      POSTGRES_DB: fitness_db
     ports:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
-      - ./schema.sql:/docker-entrypoint-initdb.d/01-schema.sql
-      - ./data.sql:/docker-entrypoint-initdb.d/02-data.sql
+      - ./schema.sql:/docker-entrypoint-initdb.d/1_schema.sql
+      - ./data.sql:/docker-entrypoint-initdb.d/2_data.sql
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U user -d ozon_store"]
-      interval: 10s
+      test: ["CMD-SHELL", "pg_isready -U fitness_user -d fitness_db"]
+      interval: 5s
       timeout: 5s
       retries: 5
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: fitness_api
+    ports:
+      - "8080:8080"
+    environment:
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: 5432
+      POSTGRES_USER: fitness_user
+      POSTGRES_PASSWORD: fitness_pass
+      POSTGRES_DB: fitness_db
+    depends_on:
+      postgres:
+        condition: service_healthy
 
 volumes:
   postgres_data:

@@ -1,0 +1,12 @@
+postgresql:
+  host: postgres
+  port: 5432
+  dbname: fitness_db
+  user: fitness_user
+  password: fitness_pass
+  connect_timeout_ms: 5000
+  statement_timeout_ms: 30000
+  pool_size: 10
+server:
+  port: 8080
+  host: 0.0.0.0

@@ -1,38 +1,63 @@
--- Пользователи
-INSERT INTO users (login, first_name, last_name, email, phone) VALUES
-('ivanov', 'Иван', 'Иванов', 'ivanov@example.com', '+79001112233'),
-('petrov', 'Пётр', 'Петров', 'petrov@example.com', '+79001112234'),
-('sidorov', 'Анна', 'Сидорова', 'sidorov@example.com', '+79001112235'),
-('kozlov', 'Михаил', 'Козлов', 'kozlov@example.com', '+79001112236'),
-('smirnova', 'Елена', 'Смирнова', 'smirnova@example.com', '+79001112237'),
-('volkov', 'Дмитрий', 'Волков', 'volkov@example.com', '+79001112238'),
-('morozov', 'Ольга', 'Морозова', 'morozov@example.com', '+79001112239'),
-('novikov', 'Александр', 'Новиков', 'novikov@example.com', '+79001112240'),
-('lebedev', 'Мария', 'Лебедева', 'lebedev@example.com', '+79001112241'),
-('popov', 'Сергей', 'Попов', 'popov@example.com', '+79001112242');
+INSERT INTO users (login, first_name, last_name, email, password_hash) VALUES
+('alex_fit', 'Alex', 'Johnson', 'alex.johnson@example.com', 'hash_1'),
+('maria_run', 'Maria', 'Garcia', 'maria.garcia@example.com', 'hash_2'),
+('ivan_strong', 'Ivan', 'Petrov', 'ivan.petrov@example.com', 'hash_3'),
+('anna_yoga', 'Anna', 'Smith', 'anna.smith@example.com', 'hash_4'),
+('dmitry_gym', 'Dmitry', 'Sokolov', 'dmitry.sokolov@example.com', 'hash_5'),
+('elena_cardio', 'Elena', 'Lee', 'elena.lee@example.com', 'hash_6'),
+('max_power', 'Max', 'Brown', 'max.brown@example.com', 'hash_7'),
+('olga_fit', 'Olga', 'Wilson', 'olga.wilson@example.com', 'hash_8'),
+('sergey_run', 'Sergey', 'Taylor', 'sergey.taylor@example.com', 'hash_9'),
+('natasha_yoga', 'Natasha', 'Anderson', 'natasha.anderson@example.com', 'hash_10'),
+('pavel_cross', 'Pavel', 'Thomas', 'pavel.thomas@example.com', 'hash_11');
 
--- Товары
-INSERT INTO products (name, description, price, stock_quantity, category) VALUES
-('Смартфон XYZ', 'Флагманский смартфон', 49990.00, 50, 'Электроника'),
-('Ноутбук ProBook', 'Для работы и игр', 89990.00, 30, 'Электроника'),
-('Наушники Wireless', 'Беспроводные, шумоподавление', 12990.00, 100, 'Электроника'),
-('Кофемашина Home', 'Автоматическая, 15 бар', 35000.00, 20, 'Бытовая техника'),
-('Рюкзак городской', 'Водонепроницаемый, 25л', 4500.00, 75, 'Аксессуары'),
-('Книга "Чистый код"', 'Роберт Мартин', 1200.00, 200, 'Книги'),
-('Клавиатура механическая', 'RGB, синие свитчи', 8900.00, 60, 'Электроника'),
-('Мышь беспроводная', 'Эргономичная, 2.4ГГц', 2500.00, 150, 'Электроника'),
-('Фитнес-браслет', 'Пульс, шаги, сон', 5990.00, 90, 'Электроника'),
-('Чайник электрический', '1.7л, быстрый нагрев', 3200.00, 120, 'Бытовая техника');
+INSERT INTO exercises (name, description, category, difficulty, created_by) VALUES
+('Running', 'Outdoor or treadmill running', 'cardio', 2, 1),
+('Push-ups', 'Classic push-ups for chest and triceps', 'strength', 2, 2),
+('Squats', 'Bodyweight squats for legs', 'strength', 2, 3),
+('Plank', 'Core stability exercise', 'balance', 3, 4),
+('Burpees', 'Full body high-intensity exercise', 'cardio', 4, 5),
+('Deadlift', 'Barbell deadlift for posterior chain', 'strength', 5, 1),
+('Yoga Flow', 'Dynamic yoga sequence', 'flexibility', 3, 6),
+('Jumping Jacks', 'Cardio warm-up exercise', 'cardio', 1, 7),
+('Lunges', 'Forward lunges for legs', 'strength', 3, 8),
+('Mountain Climbers', 'Core and cardio combo', 'cardio', 3, 9),
+('Stretching', 'Full body static stretching', 'flexibility', 1, 10);
 
--- Корзина
-INSERT INTO cart_items (user_id, product_id, quantity) VALUES
-(1, 1, 1),  -- Иванов: Смартфон
-(1, 3, 2),  -- Иванов: 2 наушников
-(2, 2, 1),  -- Петров: Ноутбук
-(3, 5, 1),  -- Сидорова: Рюкзак
-(3, 6, 3),  -- Сидорова: 3 книги
-(4, 7, 1),  -- Козлов: Клавиатура
-(5, 9, 1),  -- Смирнова: Фитнес-браслет
-(6, 4, 1),  -- Волков: Кофемашина
-(7, 10, 2), -- Морозова: 2 чайника
-(8, 8, 1);  -- Новиков: Мышь
+INSERT INTO workouts (user_id, started_at, ended_at, notes) VALUES
+(1, '2024-01-15 08:00:00+00', '2024-01-15 09:00:00+00', 'Morning cardio session'),
+(1, '2024-01-17 18:30:00+00', '2024-01-17 19:45:00+00', 'Upper body strength'),
+(2, '2024-01-16 07:00:00+00', '2024-01-16 07:45:00+00', 'Quick morning run'),
+(3, '2024-01-14 19:00:00+00', '2024-01-14 20:30:00+00', 'Leg day'),
+(4, '2024-01-18 06:30:00+00', '2024-01-18 07:30:00+00', 'Yoga morning'),
+(5, '2024-01-15 17:00:00+00', '2024-01-15 18:15:00+00', 'HIIT workout'),
+(6, '2024-01-19 08:00:00+00', '2024-01-19 09:00:00+00', 'Cardio and core'),
+(7, '2024-01-16 20:00:00+00', '2024-01-16 21:30:00+00', 'Full body strength'),
+(8, '2024-01-17 07:30:00+00', '2024-01-17 08:15:00+00', 'Morning stretch'),
+(9, '2024-01-18 18:00:00+00', '2024-01-18 19:00:00+00', 'Evening run'),
+(10, '2024-01-19 09:00:00+00', '2024-01-19 10:00:00+00', 'Flexibility session');
+
+INSERT INTO workout_exercises (workout_id, exercise_id, sets, reps, weight_kg, duration_seconds, order_index) VALUES
+(1, 1, NULL, NULL, NULL, 1800, 1),
+(1, 8, 3, 20, NULL, NULL, 2),
+(1, 10, 3, 15, NULL, NULL, 3),
+(2, 2, 4, 15, NULL, NULL, 1),
+(2, 6, 3, 10, 80.00, NULL, 2),
+(2, 3, 4, 20, 20.00, NULL, 3),
+(3, 1, NULL, NULL, NULL, 2700, 1),
+(4, 3, 5, 15, 30.00, NULL, 1),
+(4, 9, 4, 12, NULL, NULL, 2),
+(4, 4, 3, NULL, NULL, 60, 3),
+(5, 7, NULL, NULL, NULL, 3600, 1),
+(6, 5, 4, 10, NULL, NULL, 1),
+(6, 10, 3, 20, NULL, NULL, 2),
+(6, 4, 3, NULL, NULL, 45, 3),
+(7, 1, NULL, NULL, NULL, 1500, 1),
+(7, 4, 3, NULL, NULL, 90, 2),
+(8, 6, 4, 8, 100.00, NULL, 1),
+(8, 2, 4, 20, NULL, NULL, 2),
+(8, 3, 4, 15, 25.00, NULL, 3),
+(9, 11, NULL, NULL, NULL, 2700, 1),
+(10, 1, NULL, NULL, NULL, 3600, 1),
+(11, 7, NULL, NULL, NULL, 3000, 1),
+(11, 11, NULL, NULL, NULL, 600, 2);

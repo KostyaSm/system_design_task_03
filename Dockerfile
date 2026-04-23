@@ -1,12 +1,18 @@
-FROM python:3.11-slim
+FROM ubuntu:22.04 AS builder
+
+RUN apt-get update && apt-get install -y \
+    build-essential cmake git libpq-dev \
+    && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
+COPY . .
+RUN mkdir -p build && cd build && cmake .. && make -j$(nproc)
 
-RUN pip install --no-cache-dir -r requirements.txt
+FROM ubuntu:22.04
+RUN apt-get update && apt-get install -y libpq5 && rm -rf /var/lib/apt/lists/*
+WORKDIR /app
+COPY --from=builder /app/build/service /app/service
+COPY --from=builder /app/configs /app/configs
 
-# Переменная окружения для PostgreSQL
-ENV DATABASE_URL=postgresql://user:password@db:5432/ozon_store
-
-EXPOSE 8000
-
-CMD ["python", "main.py"]
+EXPOSE 8080
+CMD ["/app/service", "-c", "/app/configs/config.yaml"]

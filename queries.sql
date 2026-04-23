@@ -1,56 +1,56 @@
--- Создание нового пользователя
-INSERT INTO users (login, first_name, last_name, email, phone)
+INSERT INTO users (login, first_name, last_name, email, password_hash)
 VALUES ($1, $2, $3, $4, $5)
-RETURNING id;
+RETURNING id, login, first_name, last_name, email, created_at;
 
--- Поиск пользователя по логину
-SELECT id, login, first_name, last_name, email, phone, created_at
+SELECT id, login, first_name, last_name, email, created_at
 FROM users
 WHERE login = $1;
 
--- Поиск пользователя по маске имени и фамилии
-SELECT id, login, first_name, last_name, email, phone, created_at
+SELECT id, login, first_name, last_name, email, created_at
 FROM users
-WHERE (first_name || ' ' || last_name) ILIKE $1
-ORDER BY similarity((first_name || ' ' || last_name), $1) DESC;
+WHERE CONCAT(first_name, ' ', last_name) ILIKE $1;
 
--- Создание товара
-INSERT INTO products (name, description, price, stock_quantity, category)
+INSERT INTO exercises (name, description, category, difficulty, created_by)
 VALUES ($1, $2, $3, $4, $5)
+RETURNING id, name, description, category, difficulty, created_at;
+
+SELECT id, name, description, category, difficulty, created_by, created_at
+FROM exercises
+ORDER BY name ASC
+LIMIT $1 OFFSET $2;
+
+INSERT INTO workouts (user_id, started_at, ended_at, notes)
+VALUES ($1, $2, $3, $4)
+RETURNING id, started_at, ended_at, notes;
+
+INSERT INTO workout_exercises (workout_id, exercise_id, sets, reps, weight_kg, duration_seconds, order_index)
+VALUES ($1, $2, $3, $4, $5, $6, $7)
 RETURNING id;
 
--- Получение списка товаров
-SELECT id, name, description, price, stock_quantity, category, created_at
-FROM products
-WHERE category = COALESCE($1, category)
-  AND price <= COALESCE($2::NUMERIC, price)
-ORDER BY created_at DESC
-LIMIT $3 OFFSET $4;
-
--- Добавление товара в корзину и обновление количества
-INSERT INTO cart_items (user_id, product_id, quantity)
-VALUES ($1, $2, $3)
-ON CONFLICT (user_id, product_id)
-DO UPDATE SET quantity = cart_items.quantity + EXCLUDED.quantity
-RETURNING id;
-
--- Получение корзины для пользователя
 SELECT
-    ci.id,
-    ci.quantity,
-    ci.added_at,
-    p.id AS product_id,
-    p.name AS product_name,
-    p.price,
-    p.description,
-    (p.price * ci.quantity) AS total_price
-FROM cart_items ci
-JOIN products p ON ci.product_id = p.id
-WHERE ci.user_id = $1
-ORDER BY ci.added_at DESC;
+    w.id AS workout_id,
+    w.started_at,
+    w.ended_at,
+    w.notes,
+    we.order_index,
+    e.name AS exercise_name,
+    e.category,
+    we.sets,
+    we.reps,
+    we.weight_kg,
+    we.duration_seconds
+FROM workouts w
+JOIN workout_exercises we ON w.id = we.workout_id
+JOIN exercises e ON we.exercise_id = e.id
+WHERE w.user_id = $1
+ORDER BY w.started_at DESC, we.order_index ASC;
 
--- Общая сумма корзины
-SELECT SUM(p.price * ci.quantity) AS cart_total
-FROM cart_items ci
-JOIN products p ON ci.product_id = p.id
-WHERE ci.user_id = $1;
+SELECT
+    COUNT(DISTINCT w.id) AS total_workouts,
+    COUNT(we.id) AS total_exercises_logged,
+    COALESCE(SUM(COALESCE(we.duration_seconds, 0)), 0) AS total_duration_seconds,
+    COALESCE(AVG(EXTRACT(EPOCH FROM (w.ended_at - w.started_at))), 0) AS avg_workout_duration_seconds
+FROM workouts w
+LEFT JOIN workout_exercises we ON w.id = we.workout_id
+WHERE w.user_id = $1
+  AND w.started_at BETWEEN $2 AND $3;

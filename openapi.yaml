@@ -1,0 +1,310 @@
+openapi: 3.0.3
+info:
+  title: Fitness Tracker API
+  description: API для управления пользователями, упражнениями и тренировками
+  version: 1.0.0
+servers:
+  - url: http://localhost:8080
+    description: Local development server
+
+paths:
+  /api/v1/auth/register:
+    post:
+      summary: Создание нового пользователя
+      tags: [Auth]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterRequest'
+      responses:
+        '201':
+          description: Пользователь успешно создан
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+
+  /api/v1/users/by-login:
+    get:
+      summary: Поиск пользователя по логину
+      tags: [Users]
+      parameters:
+        - name: login
+          in: query
+          required: true
+          schema: { type: string }
+      responses:
+        '200':
+          description: Данные пользователя
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+
+  /api/v1/users/search:
+    get:
+      summary: Поиск пользователя по маске имени и фамилии
+      tags: [Users]
+      parameters:
+        - name: mask
+          in: query
+          required: true
+          schema: { type: string }
+      responses:
+        '200':
+          description: Список найденных пользователей
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/UserResponse'
+
+  /api/v1/exercises:
+    post:
+      summary: Создание упражнения
+      tags: [Exercises]
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateExerciseRequest'
+      responses:
+        '201':
+          description: Упражнение создано
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExerciseResponse'
+    get:
+      summary: Получение списка упражнений
+      tags: [Exercises]
+      parameters:
+        - name: category
+          in: query
+          schema: { type: string, enum: [strength, cardio, flexibility, hiit] }
+        - name: difficulty
+          in: query
+          schema: { type: string, enum: [beginner, intermediate, advanced] }
+      responses:
+        '200':
+          description: Список упражнений
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ExerciseResponse'
+
+  /api/v1/workouts:
+    post:
+      summary: Создание тренировки
+      tags: [Workouts]
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateWorkoutRequest'
+      responses:
+        '201':
+          description: Тренировка создана
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkoutResponse'
+
+  /api/v1/workouts/{id}/exercises:
+    post:
+      summary: Добавление упражнения в тренировку
+      tags: [Workouts]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AddExerciseToWorkoutRequest'
+      responses:
+        '200':
+          description: Упражнение добавлено
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkoutResponse'
+
+  /api/v1/users/me/workouts:
+    get:
+      summary: Получение истории тренировок пользователя
+      tags: [Workouts]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: limit
+          in: query
+          schema: { type: integer, default: 20 }
+        - name: offset
+          in: query
+          schema: { type: integer, default: 0 }
+      responses:
+        '200':
+          description: История тренировок
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/WorkoutResponse'
+
+  /api/v1/workouts/statistics:
+    get:
+      summary: Получение статистики тренировок за период
+      tags: [Workouts]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: from
+          in: query
+          required: true
+          schema: { type: string, format: date }
+        - name: to
+          in: query
+          required: true
+          schema: { type: string, format: date }
+      responses:
+        '200':
+          description: Статистика
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StatisticsResponse'
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    RegisterRequest:
+      type: object
+      required: [login, first_name, last_name, password]
+      properties:
+        login: { type: string }
+        first_name: { type: string }
+        last_name: { type: string }
+        password: { type: string }
+        email: { type: string, format: email }
+
+    UserResponse:
+      type: object
+      properties:
+        id: { type: integer }
+        login: { type: string }
+        first_name: { type: string }
+        last_name: { type: string }
+        email: { type: string, nullable: true }
+        created_at: { type: string, format: date-time }
+
+    CreateExerciseRequest:
+      type: object
+      required: [name, category, difficulty]
+      properties:
+        name: { type: string }
+        description: { type: string }
+        category: { type: string, enum: [strength, cardio, flexibility, hiit] }
+        muscle_groups: { type: array, items: { type: string } }
+        difficulty: { type: string, enum: [beginner, intermediate, advanced] }
+
+    ExerciseResponse:
+      type: object
+      properties:
+        id: { type: integer }
+        name: { type: string }
+        description: { type: string }
+        category: { type: string }
+        muscle_groups: { type: array, items: { type: string } }
+        difficulty: { type: string }
+        is_public: { type: boolean }
+        created_at: { type: string, format: date-time }
+
+    CreateWorkoutRequest:
+      type: object
+      required: [title, date]
+      properties:
+        title: { type: string }
+        date: { type: string, format: date-time }
+        duration_seconds: { type: integer }
+        notes: { type: string }
+        exercises:
+          type: array
+          items:
+            $ref: '#/components/schemas/WorkoutExerciseItem'
+
+    AddExerciseToWorkoutRequest:
+      type: object
+      required: [exercise_id, exercise_name, order]
+      properties:
+        exercise_id: { type: integer }
+        exercise_name: { type: string }
+        sets: { type: integer }
+        reps: { type: integer }
+        weight_kg: { type: number }
+        duration_seconds: { type: integer }
+        order: { type: integer }
+
+    WorkoutExerciseItem:
+      type: object
+      properties:
+        exercise_id: { type: integer }
+        exercise_name: { type: string }
+        sets: { type: integer }
+        reps: { type: integer }
+        weight_kg: { type: number }
+        duration_seconds: { type: integer }
+        order: { type: integer }
+
+    WorkoutResponse:
+      type: object
+      properties:
+        id: { type: integer }
+        user_id: { type: integer }
+        title: { type: string }
+        date: { type: string, format: date-time }
+        duration_seconds: { type: integer }
+        notes: { type: string }
+        exercises:
+          type: array
+          items:
+            $ref: '#/components/schemas/WorkoutExerciseItem'
+        created_at: { type: string, format: date-time }
+
+    StatisticsResponse:
+      type: object
+      properties:
+        total_workouts: { type: integer }
+        total_duration_minutes: { type: integer }
+        total_volume_kg: { type: number }
+        exercises_completed: { type: integer }
+        top_exercises:
+          type: array
+          items:
+            type: object
+            properties:
+              exercise_id: { type: integer }
+              exercise_name: { type: string }
+              count: { type: integer }

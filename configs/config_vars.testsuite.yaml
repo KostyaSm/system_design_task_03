@@ -1,0 +1,9 @@
+mongo-host:
+  env: MONGO_HOST
+  default: localhost
+mongo-port:
+  env: MONGO_PORT
+  default: 27017
+db-name:
+  env: DB_NAME
+  default: fitness_tracker
