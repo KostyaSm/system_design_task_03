@@ -10,9 +10,9 @@ pkg_check_modules(LIBPQ REQUIRED libpq)
 
 add_executable(fitness_api
     src/main.cpp
-    src/handlers/user_handler.cpp
-    src/handlers/exercise_handler.cpp
-    src/handlers/workout_handler.cpp
+    src/handlers/user_handlers.cpp
+    src/handlers/exercise_handlers.cpp
+    src/handlers/workout_handlers.cpp
     src/storage/postgres_storage.cpp
 )
 
